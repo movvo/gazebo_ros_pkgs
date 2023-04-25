@@ -561,34 +561,35 @@ void GazeboRosTricycleDrivePrivate::MotorController(
   // With position control, one cannot expect dynamics to work correctly.
   double diff_angle = current_angle - target_angle;
   double applied_steering_speed = 0;
+  RCLCPP_INFO(ros_node_->get_logger(), "diff_angle: %f = %f - %f", diff_angle, current_angle, target_angle);
   if (max_steering_speed_ > 0) {
     // this means we will steer using steering speed
     if (fabs(diff_angle) < max_steering_angle_tol_) {
       // we're withing angle tolerance
       applied_steering_speed = 0;
-    } else if (diff_angle < target_speed) {
-      // steer toward target angle
-      applied_steering_speed = max_steering_speed_;
     } else {
-      // steer toward target angle
-      applied_steering_speed = -max_steering_speed_;
+      // we have to move towards the target angle
+      applied_steering_speed = -(fabs(diff_angle)/diff_angle)*max_steering_speed_;
     }
+
+    RCLCPP_INFO(ros_node_->get_logger(), "Inside if: %f = %f +- %f * %f", applied_angle, current_angle, max_steering_speed_, dt);
 
     // use speed control, not recommended, for better dynamics use force control
     joints_[STEERING]->SetParam("vel", 0, applied_steering_speed);
   } else {
     // max_steering_speed_ is zero, use position control.
     // This is not a good idea if we want dynamics to work.
-    if (fabs(diff_angle) < max_steering_speed_ * dt) {
+    if (fabs(diff_angle) > max_steering_speed_ * dt) {
       // we can take a step and still not overshoot target
       if (diff_angle > 0) {
-        applied_angle = current_angle - max_steering_speed_ * dt;
-      } else {
         applied_angle = current_angle + max_steering_speed_ * dt;
+      } else {
+        applied_angle = current_angle - max_steering_speed_ * dt;
       }
     } else {
       applied_angle = target_angle;
     }
+    RCLCPP_INFO(ros_node_->get_logger(), "Inside else: %f = %f +- %f * %f", applied_angle, current_angle, max_steering_speed_, dt);
 
     joints_[STEERING]->SetPosition(0, applied_angle, true);
   }
