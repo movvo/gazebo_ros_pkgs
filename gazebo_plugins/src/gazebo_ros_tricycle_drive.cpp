@@ -572,8 +572,6 @@ void GazeboRosTricycleDrivePrivate::MotorController(
       applied_steering_speed = -(fabs(diff_angle)/diff_angle)*max_steering_speed_;
     }
 
-    RCLCPP_INFO(ros_node_->get_logger(), "Inside if: %f = %f +- %f * %f", applied_angle, current_angle, max_steering_speed_, dt);
-
     // use speed control, not recommended, for better dynamics use force control
     joints_[STEERING]->SetParam("vel", 0, applied_steering_speed);
   } else {
@@ -589,7 +587,6 @@ void GazeboRosTricycleDrivePrivate::MotorController(
     } else {
       applied_angle = target_angle;
     }
-    RCLCPP_INFO(ros_node_->get_logger(), "Inside else: %f = %f +- %f * %f", applied_angle, current_angle, max_steering_speed_, dt);
 
     joints_[STEERING]->SetPosition(0, applied_angle, true);
   }
