@@ -561,7 +561,6 @@ void GazeboRosTricycleDrivePrivate::MotorController(
   // With position control, one cannot expect dynamics to work correctly.
   double diff_angle = current_angle - target_angle;
   double applied_steering_speed = 0;
-  RCLCPP_INFO(ros_node_->get_logger(), "diff_angle: %f = %f - %f", diff_angle, current_angle, target_angle);
   if (max_steering_speed_ > 0) {
     // this means we will steer using steering speed
     if (fabs(diff_angle) < max_steering_angle_tol_) {
