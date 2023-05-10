@@ -576,7 +576,7 @@ void GazeboRosTricycleDrivePrivate::MotorController(
   } else {
     // max_steering_speed_ is zero, use position control.
     // This is not a good idea if we want dynamics to work.
-    if (fabs(diff_angle) > max_steering_speed_ * dt) {
+    if (fabs(diff_angle) > fabs(max_steering_speed_) * dt) {
       // we can take a step and still not overshoot target
       if (diff_angle > 0) {
         applied_angle = current_angle + max_steering_speed_ * dt;
@@ -586,7 +586,6 @@ void GazeboRosTricycleDrivePrivate::MotorController(
     } else {
       applied_angle = target_angle;
     }
-
     joints_[STEERING]->SetPosition(0, applied_angle, true);
   }
   //  RCLCPP_INFO(ros_node_->get_logger(),
